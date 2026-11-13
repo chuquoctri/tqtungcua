@@ -91,8 +91,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Nói 你好, 很好, 可以. Mỗi cụm 8 lần." },
       { m: "7 phút", tier: 30, t: "Đọc luật thanh 3 ngắn. Nói 你是, 我是." },
       { m: "7 phút", tier: 30, t: "Quiz." },
-      { m: "8 phút", tier: 45, t: "Hai video cặp thanh. Nhái, đừng học hết từ trong video." },
-      { m: "8 phút", tier: 60, t: "Hai video cặp thanh còn lại, chỉ cần tai." }
+      { m: "8 phút", tier: 45, t: "Nghe lại đoạn biến thanh. Nói 你好, 很好, 可以, mỗi cụm 8 lần." },
+      { m: "8 phút", tier: 60, t: "Thu bốn cặp māma, nǐ hǎo, nǐ shì, wǒ shì. Nghe lại cạnh video." }
     ],
     videos: [
       { id: "wtDtix05YmI", title: "Biến thanh, 一 và 不", channel: "Khoai Tây yêu tiếng Trung", min: 3, tier: 30, start: 500, end: 685, note: "Cùng video buổi 1. Tua tới phút 8, phần biến thanh. Cô người Việt." }
@@ -112,6 +112,7 @@ const LESSONS = [
         tier: 30,
         lines: [
           "Trong câu, thanh sống theo cặp. Tối nay chỉ cần bốn cặp: māma, nǐ hǎo, nǐ shì, wǒ shì.",
+          "Bốn cặp này là cụm đóng. Nhái cả cục. Phụ âm bên trong học ở buổi 5 và buổi 6, chưa tách từng chữ cái hôm nay.",
           "Nếu video cô giáo nói nhanh, hạ tốc độ YouTube xuống 0,75. Vẫn phải tự nói, không chỉ nghe."
         ]
       }
@@ -148,8 +149,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Đọc ba lỗi miệng bên dưới. Nói lại a, e, i." },
       { m: "6 phút", tier: 30, t: "Bốn từ giữ lại. Nói kèm thanh." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "7 phút", tier: 45, t: "Video nhóm i, phần 1." },
-      { m: "5 phút", tier: 60, t: "Video nhóm i, phần 2." }
+      { m: "11 phút", tier: 45, t: "Đoạn vần của thầy Thành Luân, khoảng phút 13 đến phút 25. Nhái a, e, i." },
+      { m: "5 phút", tier: 60, t: "Thu a, e, i, mỗi âm 5 lần. Nghe lại cạnh video cô Khoai Tây." }
     ],
     videos: [
       { id: "WMhUK8apn6E", title: "Vần a, o, e, i", channel: "Khoai Tây yêu tiếng Trung", min: 10, tier: 30, start: 57, end: 656, note: "Cô người Việt. Đoạn từ vần a tới trước vần u." },
@@ -177,7 +178,7 @@ const LESSONS = [
     vocab: [
       { z: "八", p: "bā", vi: "tám", tier: 30, note: "a mở, thanh 1." },
       { z: "茶", p: "chá", vi: "trà", tier: 30, note: "a mở, thanh 2. Tuần 3 sẽ dùng khi gọi nước." },
-      { z: "吃", p: "chī", vi: "ăn", tier: 45, note: "i sau ch không phải i cười. Nghe video nhóm i. Giữ từ này cho buổi ăn." },
+      { z: "吃", p: "chī", vi: "ăn", tier: 45, note: "i sau ch không phải i cười. Nghe trong video vần. Giữ từ này cho buổi ăn." },
       { z: "米", p: "mǐ", vi: "gạo", tier: 30, note: "i đúng, thanh 3." }
     ],
     lines: [
@@ -204,7 +205,7 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Tập ü: nói i, giữ lưỡi, chu môi. Làm 2 phút." },
       { m: "6 phút", tier: 30, t: "Nói 女, 去, 月. Mỗi từ 8 lần." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "9 phút", tier: 45, t: "Video vần o và u phần 2." }
+      { m: "9 phút", tier: 45, t: "Nói lại 女, 去, 月. Thu âm và nghe xem ü đã chu môi chưa." }
     ],
     videos: [
       { id: "WMhUK8apn6E", title: "Vần o", channel: "Khoai Tây yêu tiếng Trung", min: 3, tier: 30, start: 262, end: 422, note: "Cô người Việt. Đoạn vần o." },
@@ -261,7 +262,8 @@ const LESSONS = [
       { m: "10 phút", tier: 30, t: "Luyện trên bảng âm của trang. Mỗi cặp b/p, d/t, g/k: 6 lần, tay trước miệng." },
       { m: "7 phút", tier: 30, t: "Đọc đoạn 'b tiếng Trung không phải b tiếng Việt'." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "10 phút", tier: 60, t: "Video dài so các phụ âm, chỉ xem nếu b/p vẫn chưa tách." }
+      { m: "9 phút", tier: 45, t: "Đoạn phụ âm của thầy Thành Luân, khoảng phút 4 đến phút 13. Chỉ lấy b/p, d/t, g/k." },
+      { m: "8 phút", tier: 60, t: "Thu ba cặp bā/pà, duō/tuō, gē/kē. Hơi phải ra ở cột có bật." }
     ],
     videos: [
       { id: "MB-cIJBxAtE", title: "Thanh mẫu", channel: "Khoai Tây yêu tiếng Trung", min: 17, tier: 30, note: "Cô người Việt. Tối nay ưu tiên b/p, d/t, g/k. Hết 17 phút thì dừng." },
@@ -295,6 +297,7 @@ const LESSONS = [
         lines: [
           "m, n, l gần tiếng Việt. f hơi răng trên và môi dưới, như f, không phải ph của một số vùng.",
           "h là hơi từ họng, giống h. Đừng biến thành kh.",
+          "w và y chưa phải họ khó. w như u có hơi, gặp trong 我. y như i có hơi, gặp trong 一.",
           "Các từ 怕, 多, 拖, 科 chỉ để tách âm. Thuộc thì tốt, quên thì chưa sao. 八 và 哥 sẽ gặp lại."
         ]
       }
@@ -331,8 +334,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Đọc bảng ba cột. Nói zhī zī jī, mỗi âm 5 lần." },
       { m: "5 phút", tier: 30, t: "Riêng r: không rung lưỡi, không đọc zên." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "5 phút", tier: 45, t: "Video j q x. Nhắc lại ü phía sau." },
-      { m: "15 phút", tier: 60, t: "Video dài zi ci si và zhi chi shi ri, chỉ phần bạn còn lẫn." }
+      { m: "5 phút", tier: 45, t: "Video thầy Hiếu, nghe tách z, c, s. Làm theo đáp án trong video." },
+      { m: "8 phút", tier: 60, t: "Nói zhī, zī, jī, mỗi âm 5 lần. Sai họ nào thì tua lại đúng đoạn của thầy Thành Luân." }
     ],
     videos: [
       { id: "Kns4tHYy_2Q", title: "j q x, zh ch sh r, z c s", channel: "Thành Luân", min: 8, tier: 30, start: 549, end: 1045, note: "Thầy người Việt. Đoạn ba họ khó, khoảng phút 9 đến phút 17, rồi dừng." },
@@ -390,12 +393,12 @@ const LESSONS = [
     id: 7, week: 1, title: "Ôn tai", mark: "听",
     promise: "Tự biết âm nào đã chắc và âm nào phải mang sang tuần sau. Chưa thêm từ mới.",
     plan: [
-      { m: "8 phút", tier: 30, t: "Xem video luyện thanh vui. Nhái to." },
+      { m: "8 phút", tier: 30, t: "Xem lại video bốn thanh. Chỉ nói thanh còn sai." },
       { m: "10 phút", tier: 30, t: "Đọc lại bốn luật ở bảng âm: thanh 3, ü, hơi bật, ba họ lưỡi." },
       { m: "6 phút", tier: 30, t: "Tự kiểm phía dưới. Cái nào không, ghi vào ô yếu." },
       { m: "6 phút", tier: 30, t: "Quiz tuần. Sai thì quay lại đúng buổi, đừng học thêm từ." },
-      { m: "19 phút", tier: 45, t: "Video cách luyện thanh. Làm theo, không cần thuộc từ mới trong đó." },
-      { m: "20 phút", tier: 60, t: "Video cặp thanh nổi tiếng. Xem nửa đầu là đủ." }
+      { m: "16 phút", tier: 45, t: "Video ôn vần. Dừng ở vần còn dính, rồi thoát." },
+      { m: "17 phút", tier: 60, t: "Video ôn phụ âm. Chỉ phụ âm còn sai, rồi thoát." }
     ],
     videos: [
       { id: "wtDtix05YmI", title: "Ôn bốn thanh", channel: "Khoai Tây yêu tiếng Trung", min: 11, tier: 30, note: "Nếu buổi 1 đã xem, chỉ nói lại thanh còn sai." },
@@ -502,8 +505,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Học 对不起 và 没关系 trong phần chữ, nói 8 lần." },
       { m: "6 phút", tier: 30, t: "Nói mini: cảm ơn, đáp, xin lỗi, đáp." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "16 phút", tier: 45, t: "Video xin lỗi. Đây là video chính nếu bạn có 45 phút." },
-      { m: "9 phút", tier: 60, t: "Video cách gọi người và alo 喂." }
+      { m: "8 phút", tier: 45, t: "Nói đủ bốn câu: cảm ơn, không có gì, xin lỗi, không sao. Không nhìn chữ." },
+      { m: "6 phút", tier: 60, t: "Nói 喂 như khi nghe máy, rồi 你好 như khi gặp ngoài đường. Hai câu này khác việc." }
     ],
     videos: [
       { id: "gAApeHeoBOU", title: "Cảm ơn", channel: "Mini88", min: 25, tier: 30, start: 0, end: 1500, note: "Thầy Hiếu, người Việt. Lớp dài. Tối nay 25 phút đầu, phần cảm ơn, rồi dừng." }
@@ -553,8 +556,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Ghép câu với tên thật của bạn. Nói chậm." },
       { m: "6 phút", tier: 30, t: "Phân biệt 是 đi với danh từ." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "2 phút", tier: 45, t: "Video cực ngắn 'tên bạn là gì', nhái lần nữa." },
-      { m: "6 phút", tier: 60, t: "Đoạn 'rất vui được gặp' trong video 30 bài, từ 13:14." }
+      { m: "10 phút", tier: 45, t: "Video hỏi tên của cô Khoai Tây. Lấy câu hỏi tên, khoảng 10 phút rồi dừng." },
+      { m: "6 phút", tier: 60, t: "Nói 很高兴认识你 tám lần. Cụm này nằm ở phần nói, không có video riêng." }
     ],
     videos: [
       { id: "mcmJCnWwuAI", title: "Tôi tên là", channel: "Tiếng Trung Hoa Thư", min: 7, tier: 30, note: "Giảng tiếng Việt. Tên trong sách là nhân vật. Bạn nói tên Việt." },
@@ -605,8 +608,8 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Đọc ba khung câu. Viết miệng 6 câu." },
       { m: "6 phút", tier: 30, t: "Nói phần nói theo." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "6 phút", tier: 45, t: "Video 'Bạn khỏe không', lấy câu 吗." },
-      { m: "8 phút", tier: 60, t: "Video giới thiệu ngữ pháp, chỉ để nghe bản đồ, không ghi chép dài." }
+      { m: "6 phút", tier: 45, t: "Đặt ba câu với 吗: là giáo viên không, bận không, là học sinh không." },
+      { m: "8 phút", tier: 60, t: "Nói một câu kể, một câu phủ định, một câu hỏi. Cùng một việc, ví dụ bận." }
     ],
     videos: [
       { id: "fpndEC2ZFCQ", title: "Ngữ pháp sơ cấp", channel: "Khoai Tây yêu tiếng Trung", min: 19, tier: 30, note: "Cô người Việt. Lấy phần 是, câu hỏi 吗, và tính từ không đứng với 是. Hết phần đó thì dừng." }
@@ -668,7 +671,7 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Khóa câu 我是越南人。 Nói 10 lần với tên nước." },
       { m: "5 phút", tier: 30, t: "Hỏi 你是哪国人？ rồi tự đáp." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "8 phút", tier: 45, t: "Bài quốc tịch của Hoa Thư, nói lại bằng 越南人." }
+      { m: "8 phút", tier: 45, t: "Nói lại câu trong video, đổi thành 越南人. Mỗi câu 5 lần." }
     ],
     videos: [
       { id: "l96XuqDrqcs", title: "Tôi là người nước nào", channel: "Tiếng Trung Hoa Thư", min: 8, tier: 30, note: "Giảng tiếng Việt. Trong video là 中国人. Bạn đổi thành 越南人." }
@@ -720,8 +723,8 @@ const LESSONS = [
       { m: "10 phút", tier: 30, t: "Học quy tắc 11–99 trong bảng. Nói tuổi của bạn." },
       { m: "7 phút", tier: 30, t: "Đọc số điện thoại thật, từng số, chậm." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "8 phút", tier: 45, t: "Video hỏi số điện thoại." },
-      { m: "15 phút", tier: 60, t: "Lớp số và điện thoại của thầy Hiếu, 15 phút đầu, nếu số vẫn chưa chắc." }
+      { m: "8 phút", tier: 45, t: "Đọc số máy của bạn từng chữ, hai lần, không nhìn." },
+      { m: "25 phút", tier: 60, t: "Lớp của thầy Hiếu. Xem 25 phút rồi dừng. Số đã chắc thì chỉ đọc số máy của bạn." }
     ],
     videos: [
       { id: "ICLaRB3D8mI", title: "Số điện thoại", channel: "Tiếng Trung Hoa Thư", min: 10, tier: 30, note: "Giảng tiếng Việt. Bài số máy của giáo trình mới." },
@@ -849,7 +852,7 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Ghép gia đình thật của bạn, chỉ những người bạn có từ." },
       { m: "5 phút", tier: 30, t: "Hỏi và đáp 有…吗 / 没有." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "2 phút", tier: 45, t: "Video từ vựng gia đình rất ngắn, ôn miệng." }
+      { m: "6 phút", tier: 45, t: "Nói sáu từ gọi người trong nhà, không nhìn. Sai từ nào thì xem lại từ đó." }
     ],
     videos: [
       { id: "yH17TS-87LI", title: "Tôi có hai người con", channel: "Tiếng Trung Hoa Thư", min: 8, tier: 30, note: "Giảng tiếng Việt. Lấy từ gia đình. Câu của bạn dùng số người thật trong nhà." }
@@ -862,6 +865,7 @@ const LESSONS = [
           "家 là nhà, cũng là gia đình. 这是我妈妈。 Đây là mẹ tôi. Với người thân, thường không chèn 的: nói 我妈妈, không cần 我的妈妈. 的 để buổi 24, với đồ vật.",
           "爸爸, 妈妈, 哥哥, 姐姐, 弟弟, 妹妹. Tiếng sau của các từ này đọc nhẹ.",
           "有 là có. 没有 là không có. 你有姐姐吗？ 我有姐姐。 我没有弟弟。",
+          "Câu 我有一个哥哥 ở mức 60 phút là cụm nhái cả cục. Luật 一 đổi thanh và chữ 个 học kỹ ở buổi 22.",
           "谁 là ai. 她是谁？ Cô ấy là ai? Câu có 谁 thì không thêm 吗."
         ]
       }
@@ -904,7 +908,7 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Học công thức 星期 + số. Nói thứ của hôm nay." },
       { m: "7 phút", tier: 30, t: "Ba buổi: sáng, chiều, tối. Đặt vào một câu." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "11 phút", tier: 45, t: "Video sáng, chiều, tối." }
+      { m: "8 phút", tier: 45, t: "Nói hôm nay là thứ mấy, rồi một câu có 上午, 下午 hoặc 晚上." }
     ],
     videos: [
       { id: "xsNg1dmby4c", title: "Hôm nay tôi nghỉ", channel: "Tiếng Trung Hoa Thư", min: 8, tier: 30, note: "Giảng tiếng Việt. Lấy hôm nay, ngày mai, và nghỉ." }
@@ -955,7 +959,7 @@ const LESSONS = [
       { m: "15 phút", tier: 30, t: "Xem video xem giờ. Buổi 30 phút thì dừng ở phút 15, phần giờ và phút." },
       { m: "7 phút", tier: 30, t: "Nói giờ thật trên đồng hồ của bạn theo ba mẫu." },
       { m: "4 phút", tier: 30, t: "Quiz." },
-      { m: "10 phút", tier: 45, t: "Xem nốt video nếu lúc nãy bạn dừng giữa chừng." }
+      { m: "8 phút", tier: 45, t: "Nói lại ba mốc: giờ chẵn, giờ rưỡi, giờ hơn. Không mở video mới." }
     ],
     videos: [
       { id: "zujzJV4HvC8", title: "Tan làm lúc sáu giờ rưỡi", channel: "Tiếng Trung Hoa Thư", min: 9, tier: 30, note: "Giảng tiếng Việt. Khóa được 六点半 là đủ cho buổi ngắn." }
@@ -1005,7 +1009,7 @@ const LESSONS = [
       { m: "8 phút", tier: 30, t: "Ghép 3 câu thật: bạn muốn uống gì tối nay." },
       { m: "6 phút", tier: 30, t: "Nói theo." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "4 phút", tier: 45, t: "Video gọi món ngắn, làm quen quán ăn trước buổi 19." }
+      { m: "6 phút", tier: 45, t: "Nói 我想喝茶 và 我不喝茶. Gọi món trong quán để buổi 19." }
     ],
     videos: [
       { id: "XlCHTAR6RJA", title: "Bạn ăn gì", channel: "Trung tâm SOFL", min: 6, tier: 30, note: "Giảng tiếng Việt. Giáo trình cũ. Lấy câu ăn và uống." }
@@ -1161,10 +1165,10 @@ const LESSONS = [
     promise: "Rủ được một câu: cùng đi, và đáp được 'được' hoặc 'tôi bận'.",
     plan: [
       { m: "8 phút", tier: 30, t: "Tự dựng hội thoại 6 câu trước khi mở video." },
-      { m: "11 phút", tier: 30, t: "Xem video 'đi thôi', sửa câu của bạn cho sát." },
+      { m: "11 phút", tier: 30, t: "Xem video hẹn gặp. Lấy câu rủ và câu hẹn, sửa câu bạn vừa dựng." },
       { m: "6 phút", tier: 30, t: "Nói lại và tick tự kiểm." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "9 phút", tier: 45, t: "Video 'được rồi', lấy giọng đáp ngắn." }
+      { m: "6 phút", tier: 45, t: "Đáp 好, 可以, và 我很忙. Mỗi câu 5 lần, không nhìn." }
     ],
     videos: [
       { id: "OQAySzLI7wA", title: "Hẹn gặp ở sân bay", channel: "Tiếng Trung Hoa Thư", min: 9, tier: 30, note: "Giảng tiếng Việt. Lấy câu rủ và câu hẹn." }
@@ -1275,11 +1279,11 @@ const LESSONS = [
     id: 23, week: 4, title: "Mệt, lạnh, đẹp", mark: "太…了",
     promise: "Nói cảm giác và mức độ. Khóa cụm 太…了 như một cục, chưa phân tích 了.",
     plan: [
-      { m: "6 phút", tier: 30, t: "Xem video 我很忙, nhắc lại cầu nối 很." },
+      { m: "9 phút", tier: 30, t: "Xem video tính từ. Lấy 真. Mẫu 太…了 đọc ở phần tiếng Việt." },
       { m: "10 phút", tier: 30, t: "Học 5 tính từ. Nói một câu thật về hôm nay." },
       { m: "8 phút", tier: 30, t: "Luyện 太热了, 太累了 như cụm." },
       { m: "6 phút", tier: 30, t: "Quiz." },
-      { m: "8 phút", tier: 45, t: "Video cảm xúc, nhặt thêm mặt mũi từ." }
+      { m: "6 phút", tier: 45, t: "Nói một câu 很 và một câu 太…了 về hôm nay. Không thêm từ mới." }
     ],
     videos: [
       { id: "gqSISP7O42Y", title: "Táo ở đây thật rẻ", channel: "Tiếng Trung Hoa Thư", min: 9, tier: 30, note: "Giảng tiếng Việt. Lấy tính từ với 真. Mẫu 太…了 nằm ở phần tiếng Việt." }
@@ -1326,11 +1330,11 @@ const LESSONS = [
     id: 24, week: 4, title: "Của tôi, cái này, cái kia", mark: "的",
     promise: "Nói 'sách của tôi', 'cái này', 'cái kia', và hỏi của ai.",
     plan: [
-      { m: "12 phút", tier: 30, t: "Xem video câu hỏi. Lấy 什么 谁 哪里 哪." },
+      { m: "8 phút", tier: 30, t: "Xem video 的 và 也. Lấy chỗ đứng của 的." },
       { m: "8 phút", tier: 30, t: "Xoay 的: đồ thì có 的, mẹ thì thôi." },
       { m: "5 phút", tier: 30, t: "Nói 4 câu với một đồ thật trên bàn." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "10 phút", tier: 60, t: "Video 'món này thế nào', nếu còn muốn nghe 这 trong quán." }
+      { m: "8 phút", tier: 60, t: "Chỉ vào một đồ thật, nói 这是我的… và 那是… Không mở video mới." }
     ],
     videos: [
       { id: "rlkouVKDY3M", title: "Bố tôi cũng làm ở bệnh viện", channel: "Tiếng Trung Hoa Thư", min: 8, tier: 30, note: "Giảng tiếng Việt. Lấy 的 và 也." }
@@ -1380,8 +1384,8 @@ const LESSONS = [
       { m: "12 phút", tier: 30, t: "Xem video mua hàng. Nhái câu hỏi giá." },
       { m: "8 phút", tier: 30, t: "Luyện 买 / 卖 như một cặp thanh. Nói giá một món thật." },
       { m: "5 phút", tier: 30, t: "Quiz." },
-      { m: "2 phút", tier: 45, t: "Video cực ngắn 'bao nhiêu tiền'." },
-      { m: "12 phút", tier: 60, t: "Video giá cả dài hơn, nếu bạn hay phải mua đồ." }
+      { m: "6 phút", tier: 45, t: "Hỏi giá một món thật: 这个多少钱？ Rồi đáp bằng 块." },
+      { m: "8 phút", tier: 60, t: "Nói một câu mua và một câu bán. 买 và 卖 chỉ khác thanh." }
     ],
     videos: [
       { id: "N1T-h3WxUjQ", title: "Hỏi giá", channel: "Mini88", min: 25, tier: 30, start: 0, end: 1500, note: "Thầy Hiếu. Lấy 多少钱 và 块. Lớp dài, 25 phút rồi dừng." }
@@ -1428,11 +1432,11 @@ const LESSONS = [
     id: 26, week: 4, title: "Muốn, biết, được phép", mark: "会",
     promise: "Tách 想, 要, 会, 能, 可以. Nói được 'tôi nói được một chút tiếng Trung'.",
     plan: [
-      { m: "12 phút", tier: 30, t: "Xem video rủ làm hoặc đừng làm. Nghe 不 và động từ." },
+      { m: "12 phút", tier: 30, t: "Xem video 会. 能 và 可以 nằm ở phần tiếng Việt." },
       { m: "10 phút", tier: 30, t: "Đọc bảng năm từ. Đặt một câu cho mỗi từ, dù câu rất ngắn." },
       { m: "4 phút", tier: 30, t: "Khóa câu 我会说一点汉语。" },
       { m: "4 phút", tier: 30, t: "Quiz." },
-      { m: "5 phút", tier: 45, t: "Video 'tôi nói được một chút', nhái cho giống." }
+      { m: "5 phút", tier: 45, t: "Nói 我会说一点汉语 tám lần, không nhìn." }
     ],
     videos: [
       { id: "2AEBhTxaomU", title: "Tôi biết nói tiếng Trung", channel: "Khoai Tây yêu tiếng Trung", min: 17, tier: 30, note: "Cô người Việt. Giáo trình cũ. Lấy 会. 能 và 可以 nằm ở phần tiếng Việt." }
@@ -1543,8 +1547,8 @@ const LESSONS = [
       { m: "11 phút", tier: 30, t: "Xem video nét của cô Khoai Tây. Dừng, viết bằng ngón tay lên bàn." },
       { m: "8 phút", tier: 30, t: "Thuộc 8 chữ dễ: một, hai, ba, người, to, miệng, tốt, trung." },
       { m: "6 phút", tier: 30, t: "Quiz nhận mặt." },
-      { m: "5 phút", tier: 45, t: "Video chữ phần 3." },
-      { m: "7 phút", tier: 60, t: "Video cách chữ Trung được xây, nếu bạn muốn hiểu nét." }
+      { m: "16 phút", tier: 45, t: "Video cách nhớ chữ. Không thêm chữ ngoài 15 chữ của buổi." },
+      { m: "8 phút", tier: 60, t: "Viết lại 8 chữ dễ, không nhìn. Nét nào quên thì mở lại video nét, đừng đoán." }
     ],
     videos: [
       { id: "HI3WbiEXVJo", title: "Quy tắc nét", channel: "Khoai Tây yêu tiếng Trung", min: 11, tier: 30, note: "Cô người Việt. Xem thứ tự nét trong video, rồi viết 15 chữ của buổi. Đừng đoán nét." },

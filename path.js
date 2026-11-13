@@ -9,8 +9,9 @@ const PATH_STAGES = [
     hours: "30 tối · khoảng 22 giờ nếu mỗi tối 45 phút",
     months: "1 tháng",
     blurb: [
-      "Đây là cửa miệng. Chưa thi HSK. Tuần 1 chưa nhồi chữ.",
-      "Xong 30 buổi này rồi hãy mở HSK 1. Âm sai mà nhảy cóp từ thì các cấp sau nghe không ra."
+      "Người chưa biết gì bắt đầu ở buổi 1. Tuần 1 chỉ tai và miệng: bốn thanh, rồi vần, rồi phụ âm. Chưa chữ, chưa hội thoại.",
+      "Tuần 2 đến 4 mỗi tối một mẫu câu. Video giáo trình có nhiều câu hơn bài. Câu không nằm trong phần tiếng Việt thì bỏ qua.",
+      "Xong 30 buổi rồi hãy mở HSK 1. Vòng này lấy câu để nói được. Vòng HSK 1 học lại đúng thứ tự sách. Âm sai mà nhảy cóp từ thì các cấp sau nghe không ra."
     ]
   },
   {
@@ -25,7 +26,7 @@ const PATH_STAGES = [
       "Mỗi bài là 4 tối: xem, nói, nhận chữ, nghe lại. 16 bài × 4 tối ≈ 64 tối, khoảng 48 giờ. Cộng 30 tối nền là khoảng 70 giờ. Dải để đỗ là 80–150 giờ, nên sau khi hết bài vẫn ôn sổ từ và nghe lại video thêm vài tuần.",
       "HSK 1 kiểm tra nghe và đọc. Cấp này chưa viết bài, chưa nói trong phòng thi. Số câu trên đề chính thức hãy xem lúc đăng ký ở chinesetest.cn.",
       "Kỳ thi HSK 3.0 đầu tiên là 13/12/2026. Từ số 0 không kịp kỳ đó.",
-      "Video bài học là John Wang, cắt đúng chương của giáo trình mới. Vài bài có thêm giáo viên khác cho mức 30 phút khi chương dài."
+      "Vòng nền đã lấy vài câu của các bài này để nói được việc hằng ngày. Vòng này học lại đúng thứ tự sách, bốn tối một bài, thêm chữ và nghe. Video ngắn là Hoa Thư. Lớp dài là thầy Hiếu, xem 25 phút rồi dừng."
     ]
   },
   {
@@ -1228,7 +1229,7 @@ const PATH_LESSONS = [
     id: "hsk3-phap", stage: "hsk3", week: 1, mark: "把",
     kicker: "HSK 3 · Ngữ pháp",
     title: "Chín điểm hay gặp ở cấp 3",
-    promise: "把, 被, bổ ngữ, 越来越, 一边, 除了, 又 và 再. Video 19 phút là một lượt tiếng Anh.",
+    promise: "Tối nay khóa 把. 被, bổ ngữ, 越来越, 一边 và 除了 nằm trong phần tiếng Việt, mỗi điểm một câu. Một tối chưa thuộc hết.",
     videos: [long30("zGKwMzV7P-w", "把, thầy Hiếu", "Mini88", "Thầy người Việt, giáo trình HSK 3. Bài này đi vào 把. 被 và các điểm khác nằm ở phần tiếng Việt nếu lớp chưa nói tới.")],
     blocks: [
       { h: "把 và 被", tier: 30, lines: [

@@ -200,6 +200,40 @@ function stageLessons(id) {
   return (typeof PATH_LESSONS === "undefined" ? [] : PATH_LESSONS).filter((L) => L.stage === id);
 }
 
+function priorLesson(lesson) {
+  const list = lesson.stage ? stageLessons(lesson.stage) : LESSONS;
+  const i = list.findIndex((L) => String(L.id) === String(lesson.id));
+  if (i > 0) return list[i - 1];
+  if (!lesson.stage || typeof PATH_STAGES === "undefined") return null;
+  const ids = PATH_STAGES.map((s) => s.id);
+  const si = ids.indexOf(lesson.stage);
+  for (let k = si - 1; k >= 0; k -= 1) {
+    const prevList = stageLessons(ids[k]);
+    if (prevList.length) return prevList[prevList.length - 1];
+  }
+  return null;
+}
+
+function firstGapBefore(lesson) {
+  const all = catalog();
+  const i = all.findIndex((L) => String(L.id) === String(lesson.id));
+  for (let k = 0; k < i; k += 1) {
+    const prev = state.lessons[all[k].id];
+    if (!(prev && prev.done)) return all[k];
+  }
+  return null;
+}
+
+function earlierStageOpen(id) {
+  if (typeof PATH_STAGES === "undefined") return null;
+  const i = PATH_STAGES.findIndex((s) => s.id === id);
+  for (let k = 0; k < i; k += 1) {
+    const list = stageLessons(PATH_STAGES[k].id);
+    if (list.length && doneCount(list) < list.length) return PATH_STAGES[k];
+  }
+  return null;
+}
+
 function choiceOrder(lessonId, qi, n) {
   const idx = Array.from({ length: n }, (_, i) => i);
   let base = lessonId;
@@ -369,6 +403,7 @@ function renderHome() {
         <p>Cơ quan thi không công bố bảng giờ cho đề cương mới. Số giờ trên mỗi cấp là dải người học đang dùng để lập kế hoạch: HSK 1 khoảng 80–150 giờ từ số 0, HSK 4 khoảng 500–1.000 giờ, HSK 6 khoảng 1.500–2.500 giờ, bậc 7–9 khoảng 3.000–5.000 giờ. Mỗi tối 45 phút thì một giờ chuẩn là khoảng một tối cộng một phần ba.</p>
         <p>Bấm xong một bài chưa phải xong một cấp. Bài HSK có bốn tối. Từ cấp 3 trở đi, bài trên trang là xương ngữ pháp và cách nghe. Phần từ còn lại đi theo nhịp ghi ở trang cấp.</p>
         <p>Video là giáo viên người Việt. Phần tiếng Việt ở dưới mỗi bài khóa luật. Từ cấp 5 trở đi chưa có lớp miễn phí trọn bộ, nên video là cách nghe và bài sách, không phải hết từ của cấp.</p>
+        <p>Người chưa biết gì học từ buổi 1. Tuần 1 chỉ tai và miệng, vì sai thanh là sai từ. Tuần 2 đến 4 mỗi tối một mẫu câu. HSK 1 là vòng hai, đúng thứ tự sách. Chưa xong cấp trước thì chưa mở cấp sau.</p>
       </div>
     </section>
     <section class="week"><h2>Các cấp</h2><div class="days">${stages}</div></section>
@@ -393,7 +428,10 @@ function renderStage() {
     body = "<p class='muted'>Cấp này chưa có video bài học miễn phí trọn bộ. Nhịp ở trên là việc của mỗi tuần.</p>";
   }
   const blurb = (stage.blurb || []).map((p) => "<p>" + escapeHtml(p) + "</p>").join("");
+  const earlier = earlierStageOpen(id);
+  const gate = earlier ? `<div class="banner">Chưa xong ${escapeHtml(earlier.title)}. Làm cấp đó trước. Cấp này dùng âm và câu của cấp trước. <a href="#/cap/${earlier.id}">Mở ${escapeHtml(earlier.title)}</a></div>` : "";
   return shell("home", `
+    ${gate}
     <p class="kicker">${escapeHtml(stage.kicker)}</p>
     <h1>${escapeHtml(stage.title)}</h1>
     <p class="promise">${escapeHtml(stage.words)}. ${escapeHtml(stage.hours)}.</p>
@@ -521,8 +559,15 @@ function renderLesson() {
     : "<p class='muted'>Ở mức " + state.mode + " phút, buổi này không mở video. Phần video đang để ở mức dài hơn. Bài bên dưới là đủ cho tối nay.</p>";
   const kicker = lesson.kicker || ("Tuần " + lesson.week + " · Buổi " + lesson.id + "/30");
   const videoLead = lesson.videoLead || "Dừng sau mỗi câu mẫu và nói lại. Tuần 1 đừng nhìn phụ đề. Giọng máy chỉ là nhắc, tai thật lấy từ video.";
+  const gap = firstGapBefore(lesson);
+  const prev = priorLesson(lesson);
+  const gapHtml = gap ? `<div class="banner">Buổi này đứng sau buổi chưa xong. Làm <a href="#/bai/${gap.id}">${escapeHtml(gap.title)}</a> trước. Bài sau dùng âm và câu của bài trước.</div>` : "";
+  const recallHtml = prev ? `<div class="block"><p><strong>Trước khi mở video.</strong> Nói lại việc buổi trước, không nhìn chữ: ${escapeHtml(prev.promise)}</p></div>` : "";
+  const skipNote = !lesson.stage && lesson.week > 1 ? " Câu trong video không có trong phần giảng thì bỏ qua." : "";
   return shell("lesson", `
+    ${gapHtml}
     ${due ? `<div class="banner">Có ${due} từ đến hạn. Với mức ${state.mode} phút, ôn ${Math.min(due, reviewLimit())} từ rồi hãy xem video. <a href="#/on">Ôn trước</a></div>` : ""}
+    ${recallHtml}
     <article class="lesson">
       <p class="kicker">${escapeHtml(kicker)}${saved && saved.done ? " · đã xong " + saved.score + "/" + saved.total : ""}</p>
       <h1>${escapeHtml(lesson.title)}</h1>
@@ -535,7 +580,7 @@ function renderLesson() {
         <button type="button" data-act="jump" data-to="quiz">Quiz</button>
       </div>
       <ol class="plan">${plan.map((p) => `<li><strong>${escapeHtml(p.m)}.</strong> ${escapeHtml(p.t)}</li>`).join("")}</ol>
-      <section class="section" id="video"><h2>Video</h2><p class="muted">${escapeHtml(videoLead)}</p>${videoBlock}</section>
+      <section class="section" id="video"><h2>Video</h2><p class="muted">${escapeHtml(videoLead)}${escapeHtml(skipNote)}</p>${videoBlock}</section>
       <section class="section" id="giang"><h2>Giảng bằng tiếng Việt</h2>${blocksHtml(lesson)}</section>
       <section class="section" id="tu"><h2>Từ của buổi</h2>${wordsHtml(lesson)}</section>
       <section class="section" id="noi"><h2>Nói theo</h2>${linesHtml(lesson)}${scenesHtml(lesson)}${oralHtml(lesson)}</section>
@@ -624,7 +669,9 @@ function renderHelp() {
       <h1>Cách học một mình</h1>
       <p>Mỗi tối một buổi, theo thứ tự. 30 phút là phần gắn mức 30. 45 phút thêm phần mức 45. 60 phút mới mở phần mức 60. Đổi mức ở góc trên, trang sẽ hiện hoặc giấu bài cho khớp.</p>
       <h2>Một tối đi theo thứ này</h2>
-      <p>Ôn từ đến hạn, nếu có. Xem video và dừng để nhái. Đọc phần tiếng Việt. Lật từ, nghe, nói. Làm quiz. Bấm xong buổi. Từ mới hiện lại vào tối hôm sau, không hiện lại ngay trong đêm, vì vừa học xong.</p>
+      <p>Nói lại việc buổi trước, không nhìn chữ. Ôn từ đến hạn, nếu có. Xem video và dừng để nhái. Câu không có trong phần giảng thì bỏ qua. Đọc phần tiếng Việt. Nói các câu mẫu. Làm quiz. Bấm xong buổi. Từ mới hiện lại vào tối hôm sau, không hiện lại ngay trong đêm, vì vừa học xong.</p>
+      <h2>Vì sao thứ tự này</h2>
+      <p>Sai thanh là sai từ, nên tuần 1 chưa nhồi chữ và chưa nhồi hội thoại. Mỗi tối sau đó chỉ thêm một mẫu câu. Nhớ lại trước khi xem giúp giữ âm đã học. Video giáo trình dài hơn bài của tối. Hết 30 buổi nền mới vào HSK 1. Vòng đó học lại 15 bài sách vì vòng đầu chỉ lấy câu để sống, chưa đủ 300 từ và chưa đủ giờ. Điểm trên trang không phải điểm đỗ.</p>
       <h2>Giọng đọc trên máy</h2>
       <p>Windows: Cài đặt, Thời gian và ngôn ngữ, Ngôn ngữ, thêm Tiếng Trung giản thể, rồi tải Giọng nói. Chrome hoặc Edge sẽ dùng giọng đó cho nút Nghe. Buổi 1 đến buổi 7 vẫn lấy tai từ video, không lấy từ giọng máy.</p>
       <h2>Dữ liệu ở đâu</h2>
@@ -637,7 +684,7 @@ function renderHelp() {
       <h2>Mở trang này</h2>
       <p>Bấm đúp <span class="han">index.html</span> là học được. Nếu khung video trắng, bấm đúp start.ps1 trong thư mục này, rồi mở <span class="han">http://127.0.0.1:8765</span>. Địa chỉ đó là chính máy này. Tắt máy, hoặc tắt cửa sổ server, là trang tắt. Máy khác trong nhà cũng không vào được.</p>
       <h2>Tắt máy vẫn học được</h2>
-      <p>Địa chỉ miễn phí: <a href="https://chuquoctri.github.io/hoc-tieng-trung/">chuquoctri.github.io/hoc-tieng-trung</a>. Tắt máy nhà vẫn mở được. Trang không có mật khẩu. Ai có đường dẫn cũng đọc được bài. Sổ từ của mỗi trình duyệt vẫn trống, vì tiến độ không nằm trên máy chủ. Máy đang học ở localhost thì xuất bản lưu rồi nhập lại trên địa chỉ này.</p>
+      <p>Địa chỉ miễn phí: <a href="https://chuquoctri.github.io/tqtungcua/">chuquoctri.github.io/tqtungcua</a>. Tắt máy nhà vẫn mở được. Trang không có mật khẩu. Ai có đường dẫn cũng đọc được bài. Sổ từ của mỗi trình duyệt vẫn trống, vì tiến độ không nằm trên máy chủ. Máy đang học ở localhost thì xuất bản lưu rồi nhập lại trên địa chỉ này.</p>
       <h2>Video lấy từ đâu</h2>
       <ul>${sources}</ul>
       <p>Trang chủ là cả lộ trình HSK 3.0, từ phần nền tới bậc 7–9. Giờ trên mỗi cấp là dải lập kế hoạch, vì đề cương mới không kèm bảng giờ chính thức. Bài cấp 1 và cấp 2 đi theo giáo trình mới. Từ cấp 3, bài trên trang là ngữ pháp, cách nghe và nhịp từ. Hết video của một cấp chưa phải đỗ cấp đó.</p>
