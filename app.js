@@ -40,7 +40,7 @@ const RULES = [
 ];
 
 const state = load();
-const ui = { quiz: {}, rev: null, scrollTo: "", keepScroll: false };
+const ui = { quiz: {}, rev: null, scrollTo: "", keepScroll: false, hear: null, rec: null, klass: null };
 
 function fresh() {
   return {
@@ -49,6 +49,7 @@ function fresh() {
     lessons: {},
     cards: {},
     oral: {},
+    speak: {},
     streak: { last: "", n: 0 },
     created: Date.now()
   };
@@ -71,6 +72,7 @@ function normalize(s) {
     lessons: s.lessons && typeof s.lessons === "object" ? s.lessons : {},
     cards: s.cards && typeof s.cards === "object" ? s.cards : {},
     oral: s.oral && typeof s.oral === "object" ? s.oral : {},
+    speak: s.speak && typeof s.speak === "object" ? s.speak : {},
     streak: s.streak && typeof s.streak === "object" ? s.streak : base.streak,
     created: s.created || Date.now()
   };
@@ -265,6 +267,130 @@ function visibleQuiz(lesson) {
   return lesson.exam ? (lesson.quiz || []) : visibleOf(lesson.quiz);
 }
 
+function hanziOnly(s) {
+  return String(s || "").replace(/[^\u3400-\u9fff]/g, "");
+}
+
+function lineKey(ln) {
+  return ln.z + "|" + ln.p;
+}
+
+function speakMap(lesson) {
+  const id = String(lesson.id);
+  if (!state.speak[id] || typeof state.speak[id] !== "object") state.speak[id] = {};
+  return state.speak[id];
+}
+
+function speakStat(lesson) {
+  const lines = visibleOf(lesson.lines);
+  if (!lines.length) return null;
+  const bag = state.speak[String(lesson.id)] || {};
+  let chuan = 0;
+  lines.forEach((ln) => { if (bag[lineKey(ln)] === "chuan") chuan += 1; });
+  return { chuan: chuan, n: lines.length };
+}
+
+function machineHear(target, heard) {
+  const a = hanziOnly(target);
+  const b = hanziOnly(heard);
+  if (!b) return "Máy không nghe ra chữ Trung. Đối miệng với video, rồi bấm Chuẩn hoặc Chưa.";
+  if (a && (b === a || b.includes(a) || a.includes(b))) return "Máy nghe ra đúng chữ: " + b + ". Máy không chấm thanh. Đối với video rồi bấm Chuẩn hoặc Chưa.";
+  return "Máy nghe ra: " + b + ". Khác câu mẫu. Nói lại, hoặc đối video rồi tự chấm.";
+}
+
+function stopListen() {
+  if (!ui.rec) return;
+  try { ui.rec.onresult = null; ui.rec.onerror = null; ui.rec.stop(); } catch (err) { /* mic đã tắt */ }
+  ui.rec = null;
+}
+
+function startListen(lesson, ln) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const key = lineKey(ln);
+  if (!SR) {
+    ui.hear = { lessonId: String(lesson.id), key: key, note: "Trình duyệt này chưa nhận giọng. Mở bằng Edge hoặc Chrome. Thanh vẫn đối với video rồi bấm Chuẩn hoặc Chưa." };
+    ui.keepScroll = true;
+    draw();
+    return;
+  }
+  stopListen();
+  const rec = new SR();
+  ui.rec = rec;
+  rec.lang = "zh-CN";
+  rec.interimResults = false;
+  rec.maxAlternatives = 3;
+  ui.hear = { lessonId: String(lesson.id), key: key, note: "Đang nghe. Nói câu mẫu một lần." };
+  ui.keepScroll = true;
+  draw();
+  rec.onresult = (ev) => {
+    let best = "";
+    const alts = ev.results[0];
+    for (let i = 0; i < alts.length; i += 1) {
+      const t = alts[i].transcript || "";
+      if (hanziOnly(t).length > hanziOnly(best).length) best = t;
+    }
+    if (!best && alts[0]) best = alts[0].transcript || "";
+    ui.hear = { lessonId: String(lesson.id), key: key, note: machineHear(ln.z, best) };
+    ui.rec = null;
+    ui.keepScroll = true;
+    draw();
+  };
+  rec.onerror = () => {
+    ui.hear = { lessonId: String(lesson.id), key: key, note: "Máy không nghe được. Cho phép micro, nói lại, hoặc đối video rồi bấm Chuẩn hoặc Chưa." };
+    ui.rec = null;
+    ui.keepScroll = true;
+    draw();
+  };
+  try { rec.start(); } catch (err) {
+    ui.hear = { lessonId: String(lesson.id), key: key, note: "Máy không mở được micro." };
+    ui.rec = null;
+    draw();
+  }
+}
+
+function setLearned(lesson, on) {
+  if (!on) {
+    delete state.lessons[lesson.id];
+    save();
+    return;
+  }
+  const prev = state.lessons[lesson.id] || {};
+  let score = prev.score;
+  let total = prev.total;
+  if (ui.klass && String(ui.klass.id) === String(lesson.id)) {
+    const qs = visibleQuiz(lesson);
+    const answered = qs.length && qs.every((_, i) => ui.klass.picks[i] !== undefined);
+    if (answered) {
+      score = 0;
+      qs.forEach((q, i) => { if (ui.klass.picks[i] === q.answer) score += 1; });
+      total = qs.length;
+    }
+  }
+  state.lessons[lesson.id] = {
+    done: true,
+    score: score == null ? null : score,
+    total: total == null ? null : total,
+    at: Date.now(),
+    day: todayStr()
+  };
+  enrollVisible(lesson);
+  touchStreak();
+  save();
+}
+
+function lessonPill(L, next) {
+  const st = state.lessons[L.id];
+  const sp = speakStat(L);
+  const speak = sp ? (sp.chuan === sp.n ? " · nói chuẩn" : " · nói " + sp.chuan + "/" + sp.n) : "";
+  if (st && st.done) {
+    if (st.total) return st.score + "/" + st.total + speak;
+    return "đã học" + speak;
+  }
+  if (sp && sp.chuan) return "nói " + sp.chuan + "/" + sp.n;
+  if (L.id === next.id) return "tiếp theo";
+  return "chưa học";
+}
+
 function speak(text, rate) {
   if (!window.speechSynthesis) {
     toast("Trình duyệt này không đọc tiếng Trung. Nhái theo video.");
@@ -308,6 +434,12 @@ function lessonFromHash() {
   return findLesson(m[1]);
 }
 
+function classFromHash() {
+  const m = location.hash.match(/^#\/lop\/([A-Za-z0-9-]+)$/);
+  if (!m) return null;
+  return findLesson(m[1]);
+}
+
 function stageFromHash() {
   const m = (location.hash || "").match(/^#\/cap\/([a-z0-9]+)$/);
   return m ? m[1] : "";
@@ -317,6 +449,7 @@ function currentHash() {
   const h = location.hash || "#/";
   if (h === "#" || h === "#/") return "home";
   if (h.startsWith("#/bai/")) return "lesson";
+  if (h.startsWith("#/lop/")) return "class";
   if (h.startsWith("#/cap/")) return "stage";
   if (h.startsWith("#/on")) return "review";
   if (h.startsWith("#/bang")) return "chart";
@@ -359,7 +492,7 @@ function shell(here, main) {
 function lessonLink(L, next) {
   const st = state.lessons[L.id];
   const cls = st && st.done ? "day done" : (L.id === next.id ? "day now" : "day");
-  const pill = st && st.done ? (st.score + "/" + st.total) : (L.id === next.id ? "tiếp theo" : "bài");
+  const pill = lessonPill(L, next);
   const num = typeof L.id === "number" ? String(L.id).padStart(2, "0") : String(L.week || "").padStart(2, "0");
   return `<a class="${cls}" href="#/bai/${L.id}"><span class="n">${num}</span><span><strong>${escapeHtml(L.title)}</strong><small>${escapeHtml(L.promise)}</small></span><span class="pill">${escapeHtml(pill)}</span></a>`;
 }
@@ -374,7 +507,8 @@ function renderHome() {
     const list = stageLessons(s.id);
     const d = doneCount(list);
     const num = s.id === "hsk79" ? "7–9" : String(i).padStart(2, "0");
-    return `<a class="day" href="#/cap/${s.id}"><span class="n">${num}</span><span><strong>${escapeHtml(s.title)}</strong><small>${escapeHtml(s.words)} · ${escapeHtml(s.months)}</small></span><span class="pill">${list.length ? d + "/" + list.length : "nhịp"}</span></a>`;
+    const doneAll = list.length && d === list.length;
+    return `<a class="day${doneAll ? " done" : ""}" href="#/cap/${s.id}"><span class="n">${num}</span><span><strong>${escapeHtml(s.title)}</strong><small>${escapeHtml(s.words)} · ${escapeHtml(s.months)}</small></span><span class="pill">${list.length ? d + "/" + list.length : "nhịp"}</span></a>`;
   }).join("");
   return shell("home", `
     <section class="hero">
@@ -478,10 +612,23 @@ function wordsHtml(lesson) {
   }).join("")}</div>`;
 }
 
+function talkControls(lesson, ln) {
+  const key = lineKey(ln);
+  const mark = (state.speak[String(lesson.id)] || {})[key] || "";
+  const live = ui.hear && ui.hear.lessonId === String(lesson.id) && ui.hear.key === key;
+  const note = live ? `<p class="heard">${escapeHtml(ui.hear.note)}</p>` : "";
+  return `<div class="row">
+      <button type="button" data-act="speak" data-text="${escapeHtml(ln.z)}">Nghe mẫu</button>
+      <button type="button" data-act="hear" data-lesson="${escapeHtml(lesson.id)}" data-key="${escapeHtml(key)}">Thu và chấm chữ</button>
+      <button type="button" class="${mark === "chuan" ? "markon" : ""}" data-act="mark-speak" data-lesson="${escapeHtml(lesson.id)}" data-key="${escapeHtml(key)}" data-mark="chuan">Chuẩn</button>
+      <button type="button" class="${mark === "chua" ? "markoff" : ""}" data-act="mark-speak" data-lesson="${escapeHtml(lesson.id)}" data-key="${escapeHtml(key)}" data-mark="chua">Chưa</button>
+    </div>${note}<p class="muted">Máy chỉ nghe ra chữ. Thanh đối với video, rồi mới bấm Chuẩn hoặc Chưa.</p>`;
+}
+
 function linesHtml(lesson) {
   const lines = visibleOf(lesson.lines);
   if (!lines.length) return "";
-  return lines.map((ln) => `<div class="line"><div><div class="hz">${escapeHtml(ln.z)}</div><div class="py">${pyHtml(ln.p)}</div><div class="muted">${escapeHtml(ln.vi)}</div></div><button type="button" data-act="speak" data-text="${escapeHtml(ln.z)}">Nói theo</button></div>`).join("");
+  return lines.map((ln) => `<div class="line line-talk"><div><div class="hz">${escapeHtml(ln.z)}</div><div class="py">${pyHtml(ln.p)}</div><div class="muted">${escapeHtml(ln.vi)}</div>${talkControls(lesson, ln)}</div></div>`).join("");
 }
 
 function scenesHtml(lesson) {
@@ -490,7 +637,7 @@ function scenesHtml(lesson) {
       <summary>${escapeHtml(sc.title)}</summary>
       <p>${escapeHtml(sc.you)}</p>
       <p class="muted">Nói xong mới mở câu mẫu.</p>
-      ${sc.model.map((ln) => `<div class="line"><div><div class="hz">${escapeHtml(ln.z)}</div><div class="py">${pyHtml(ln.p)}</div><div class="muted">${escapeHtml(ln.vi)}</div></div><button type="button" data-act="speak" data-text="${escapeHtml(ln.z)}">Nghe</button></div>`).join("")}
+      ${sc.model.map((ln) => `<div class="line line-talk"><div><div class="hz">${escapeHtml(ln.z)}</div><div class="py">${pyHtml(ln.p)}</div><div class="muted">${escapeHtml(ln.vi)}</div>${talkControls(lesson, ln)}</div></div>`).join("")}
     </details>`).join("");
 }
 
@@ -569,9 +716,10 @@ function renderLesson() {
     ${due ? `<div class="banner">Có ${due} từ đến hạn. Với mức ${state.mode} phút, ôn ${Math.min(due, reviewLimit())} từ rồi hãy xem video. <a href="#/on">Ôn trước</a></div>` : ""}
     ${recallHtml}
     <article class="lesson">
-      <p class="kicker">${escapeHtml(kicker)}${saved && saved.done ? " · đã xong " + saved.score + "/" + saved.total : ""}</p>
+      <p class="kicker">${escapeHtml(kicker)}${saved && saved.done ? " · đã học" + (saved.total ? " " + saved.score + "/" + saved.total : "") : ""}</p>
       <h1>${escapeHtml(lesson.title)}</h1>
       <p class="promise">${escapeHtml(lesson.promise)}</p>
+      ${learnedBar(lesson)}
       <div class="jump">
         <button type="button" data-act="jump" data-to="video">Video</button>
         <button type="button" data-act="jump" data-to="giang">Giảng</button>
@@ -672,6 +820,9 @@ function renderHelp() {
       <p>Nói lại việc buổi trước, không nhìn chữ. Ôn từ đến hạn, nếu có. Xem video và dừng để nhái. Câu không có trong phần giảng thì bỏ qua. Đọc phần tiếng Việt. Nói các câu mẫu. Làm quiz. Bấm xong buổi. Từ mới hiện lại vào tối hôm sau, không hiện lại ngay trong đêm, vì vừa học xong.</p>
       <h2>Vì sao thứ tự này</h2>
       <p>Sai thanh là sai từ, nên tuần 1 chưa nhồi chữ và chưa nhồi hội thoại. Mỗi tối sau đó chỉ thêm một mẫu câu. Nhớ lại trước khi xem giúp giữ âm đã học. Video giáo trình dài hơn bài của tối. Hết 30 buổi nền mới vào HSK 1. Vòng đó học lại 15 bài sách vì vòng đầu chỉ lấy câu để sống, chưa đủ 300 từ và chưa đủ giờ. Điểm trên trang không phải điểm đỗ.</p>
+      <h2>Giáo viên, chấm nói, dấu đã học</h2>
+      <p>Nút Vào lớp mở giáo viên của đúng bài đó. Giáo viên giảng từng đoạn đã viết, rồi hỏi từng câu. Trang này không có mô hình tự viết bài mới, vì bài mới dễ bịa thanh và bịa luật.</p>
+      <p>Thu và chấm chữ dùng micro của Edge hoặc Chrome. Máy chỉ đối chữ. Thanh thì nghe video rồi bấm Chuẩn hoặc Chưa. Đánh dấu đã học thì buổi đó hiện trên lộ trình. Bỏ dấu nếu muốn học lại.</p>
       <h2>Giọng đọc trên máy</h2>
       <p>Windows: Cài đặt, Thời gian và ngôn ngữ, Ngôn ngữ, thêm Tiếng Trung giản thể, rồi tải Giọng nói. Chrome hoặc Edge sẽ dùng giọng đó cho nút Nghe. Buổi 1 đến buổi 7 vẫn lấy tai từ video, không lấy từ giọng máy.</p>
       <h2>Dữ liệu ở đâu</h2>
@@ -692,6 +843,85 @@ function renderHelp() {
   `);
 }
 
+function learnedBar(lesson) {
+  const on = state.lessons[lesson.id] && state.lessons[lesson.id].done;
+  const sp = speakStat(lesson);
+  const say = sp ? " Nói đã chấm chuẩn " + sp.chuan + "/" + sp.n + " câu." : "";
+  return `<div class="block"><p>${on ? "Buổi này đã có dấu trên lộ trình." : "Buổi này chưa có dấu trên lộ trình."}${escapeHtml(say)}</p>
+    <p class="row"><a class="primary" href="#/lop/${lesson.id}">Vào lớp với giáo viên</a>
+    <button type="button" data-act="mark-lesson" data-lesson="${lesson.id}" data-on="${on ? "0" : "1"}">${on ? "Bỏ dấu đã học" : "Đánh dấu đã học"}</button></p></div>`;
+}
+
+function classSteps(lesson) {
+  const steps = [{
+    kind: "say",
+    title: "Vào lớp",
+    body: `<p>${escapeHtml(lesson.promise)}</p><p class="muted">Mình giảng đúng bài này và hỏi từng câu. Mình không viết thêm luật, không thêm từ ngoài bài.</p>`
+  }];
+  visibleOf(lesson.blocks).forEach((b) => {
+    const lines = (b.lines || []).map((line) => "<p>" + rich(line) + "</p>").join("");
+    const tableNote = b.table ? "<p>Phần này có bảng. Muốn nhìn lại thì mở trang bài.</p>" : "";
+    steps.push({ kind: "say", title: b.h, body: lines + tableNote });
+  });
+  visibleQuiz(lesson).forEach((q, i) => steps.push({ kind: "ask", qi: i, q: q }));
+  visibleOf(lesson.lines).forEach((ln) => steps.push({ kind: "talk", ln: ln }));
+  steps.push({ kind: "end" });
+  return steps;
+}
+
+function classState(lesson) {
+  if (!ui.klass || String(ui.klass.id) !== String(lesson.id)) ui.klass = { id: lesson.id, step: 0, picks: {} };
+  return ui.klass;
+}
+
+function renderClass() {
+  const lesson = classFromHash();
+  if (!lesson) return shell("lesson", "<p>Không có buổi này.</p><p><a href=\"#/\">Về lộ trình</a></p>");
+  const steps = classSteps(lesson);
+  const ks = classState(lesson);
+  if (ks.step >= steps.length) ks.step = steps.length - 1;
+  const step = steps[ks.step];
+  const sp = speakStat(lesson);
+  let body = "";
+  if (step.kind === "say") {
+    body = `<h2>${escapeHtml(step.title)}</h2>${step.body}<p class="row"><button type="button" class="primary" data-act="class-go" data-dir="1">Tiếp</button></p>`;
+  } else if (step.kind === "ask") {
+    const q = step.q;
+    const order = choiceOrder(lesson.id, step.qi, q.choices.length);
+    const pick = ks.picks[step.qi];
+    const buttons = order.map((orig, visual) => {
+      let cls = "";
+      if (pick !== undefined && orig === q.answer) cls = "good";
+      if (pick !== undefined && pick === orig && orig !== q.answer) cls = "bad";
+      return `<button type="button" class="${cls}" data-act="class-pick" data-qi="${step.qi}" data-choice="${orig}" data-key="${visual}" ${pick !== undefined ? "disabled" : ""}>${visual + 1}. ${rich(q.choices[orig])}</button>`;
+    }).join("");
+    const why = pick !== undefined ? `<p class="why">${rich(q.why)}</p>` : "";
+    const spoken = q.speak ? `<div class="row"><span class="hz">${escapeHtml(q.speak)}</span><button type="button" data-act="speak" data-text="${escapeHtml(q.speak)}">Nghe</button></div>` : "";
+    body = `<p class="kicker">Câu hỏi ${step.qi + 1}</p><p>${rich(q.prompt)}</p>${spoken}<div class="choices">${buttons}</div>${why}<p class="row"><button type="button" data-act="class-go" data-dir="-1">Trước</button><button type="button" class="primary" data-act="class-go" data-dir="1">Tiếp</button></p>`;
+  } else if (step.kind === "talk") {
+    const ln = step.ln;
+    body = `<p class="kicker">Đến lượt nói</p><div class="hz">${escapeHtml(ln.z)}</div><div class="py">${pyHtml(ln.p)}</div><p>${escapeHtml(ln.vi)}</p>${talkControls(lesson, ln)}<p class="row"><button type="button" data-act="class-go" data-dir="-1">Trước</button><button type="button" class="primary" data-act="class-go" data-dir="1">Tiếp</button></p>`;
+  } else {
+    const qs = visibleQuiz(lesson);
+    let score = 0;
+    let answered = 0;
+    qs.forEach((q, i) => {
+      if (ks.picks[i] === undefined) return;
+      answered += 1;
+      if (ks.picks[i] === q.answer) score += 1;
+    });
+    const on = state.lessons[lesson.id] && state.lessons[lesson.id].done;
+    body = `<h2>Hết buổi</h2><p>Câu hỏi đúng ${score}/${qs.length}. Đã trả lời ${answered}/${qs.length}.${sp ? " Nói chuẩn " + sp.chuan + "/" + sp.n + " câu." : ""}</p><p>Dấu đã học hiện trên lộ trình. Điểm này không phải điểm thi.</p><p class="row"><button type="button" data-act="class-go" data-dir="-1">Trước</button><button type="button" class="primary" data-act="mark-lesson" data-lesson="${lesson.id}" data-on="${on ? "0" : "1"}">${on ? "Bỏ dấu đã học" : "Đánh dấu đã học"}</button><a href="#/bai/${lesson.id}">Về trang bài</a></p>`;
+  }
+  return shell("lesson", `
+    <article class="classbox" id="lop">
+      <p class="kicker">Giáo viên · bước ${ks.step + 1}/${steps.length}</p>
+      <h1>${escapeHtml(lesson.title)}</h1>
+      <div class="block">${body}</div>
+      <p><a href="#/bai/${lesson.id}">Mở bài đầy đủ</a></p>
+    </article>`);
+}
+
 function draw() {
   const here = currentHash();
   const root = document.getElementById("app");
@@ -699,6 +929,7 @@ function draw() {
   const savedY = window.scrollY;
   let html = "";
   if (here === "lesson") html = renderLesson();
+  else if (here === "class") html = renderClass();
   else if (here === "stage") html = renderStage();
   else if (here === "review") html = renderReview();
   else if (here === "chart") html = renderChart();
@@ -735,6 +966,63 @@ function onClick(e) {
   }
   if (act === "speak") {
     speak(b.dataset.text, Number(b.dataset.rate) || 0.85);
+    return;
+  }
+  if (act === "hear") {
+    const lesson = findLesson(b.dataset.lesson);
+    if (!lesson) return;
+    const ln = (lesson.lines || []).concat((lesson.scenes || []).flatMap((sc) => sc.model || [])).find((x) => lineKey(x) === b.dataset.key);
+    if (!ln) return;
+    startListen(lesson, ln);
+    return;
+  }
+  if (act === "mark-speak") {
+    const lesson = findLesson(b.dataset.lesson);
+    if (!lesson) return;
+    speakMap(lesson)[b.dataset.key] = b.dataset.mark === "chua" ? "chua" : "chuan";
+    save();
+    ui.keepScroll = true;
+    draw();
+    return;
+  }
+  if (act === "mark-lesson") {
+    const lesson = findLesson(b.dataset.lesson);
+    if (!lesson) return;
+    const on = b.dataset.on === "1";
+    setLearned(lesson, on);
+    toast(on ? "Đã đánh dấu trên lộ trình." : "Đã bỏ dấu buổi này.");
+    ui.keepScroll = true;
+    draw();
+    return;
+  }
+  if (act === "class-pick") {
+    const lesson = classFromHash();
+    if (!lesson) return;
+    const ks = classState(lesson);
+    if (ks.picks[b.dataset.qi] !== undefined) return;
+    ks.picks[b.dataset.qi] = Number(b.dataset.choice);
+    ui.keepScroll = true;
+    draw();
+    return;
+  }
+  if (act === "class-go") {
+    const lesson = classFromHash();
+    if (!lesson) return;
+    const ks = classState(lesson);
+    const steps = classSteps(lesson);
+    const dir = Number(b.dataset.dir) || 1;
+    const step = steps[ks.step];
+    if (dir > 0 && step && step.kind === "ask" && ks.picks[step.qi] === undefined) {
+      toast("Chọn một câu trả lời đã.");
+      return;
+    }
+    if (dir > 0 && step && step.kind === "talk" && !(state.speak[String(lesson.id)] && state.speak[String(lesson.id)][lineKey(step.ln)])) {
+      toast("Bấm Chuẩn hoặc Chưa. Thanh thì đối với video.");
+      return;
+    }
+    ks.step = Math.max(0, Math.min(steps.length - 1, ks.step + dir));
+    ui.scrollTo = "lop";
+    draw();
     return;
   }
   if (act === "pick") {
@@ -889,7 +1177,7 @@ function init() {
   document.body.addEventListener("click", onClick);
   document.body.addEventListener("change", onChange);
   document.addEventListener("keydown", onKey);
-  window.addEventListener("hashchange", draw);
+  window.addEventListener("hashchange", () => { stopListen(); draw(); });
   if (window.speechSynthesis) {
     speechSynthesis.getVoices();
     speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();

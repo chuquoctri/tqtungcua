@@ -195,6 +195,13 @@ th { color: var(--muted); font-weight: 600; }
   border-bottom: 1px solid var(--line);
 }
 .line .hz { font-family: var(--sc); font-size: 1.25rem; }
+.line-talk { display: block; }
+.line-talk .row { margin-top: 8px; }
+.heard { color: var(--muted); margin: 8px 0 0; }
+button.markon { border-color: var(--ok); color: var(--ok); }
+button.markoff { border-color: var(--bad); color: var(--bad); }
+.classbox { max-width: 680px; }
+.classbox .hz { font-family: var(--sc); font-size: 1.7rem; }
 
 .q { padding: 14px; margin: 10px 0; }
 .choices { display: grid; gap: 8px; margin-top: 8px; }
